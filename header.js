@@ -1,3 +1,5 @@
+console.log("🧪 Script header.js cargado");
+
 (function () {
   function waitForElements(selectors, callback, interval = 100, timeout = 5000) {
     const start = Date.now();
