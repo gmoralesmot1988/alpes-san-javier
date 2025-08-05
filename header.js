@@ -1,4 +1,26 @@
 (function () {
+  // 🔁 Esperar a que todos los elementos estén disponibles en el DOM
+  function waitForElements(selectors, callback, timeout = 5000) {
+    const interval = 100;
+    const maxAttempts = timeout / interval;
+    let attempts = 0;
+
+    const check = () => {
+      const elements = selectors.map(selector => document.querySelector(selector));
+      if (elements.every(el => el)) {
+        console.log("✅ Todos los elementos del header están disponibles.");
+        callback();
+      } else if (attempts++ < maxAttempts) {
+        setTimeout(check, interval);
+      } else {
+        console.warn("⚠️ No se encontraron todos los elementos para la animación del header.");
+      }
+    };
+
+    check();
+  }
+
+  // 🎬 Animación del Hero Header
   function initHeroHeader() {
     console.log("🎬 Hero Header Animation INIT");
 
@@ -10,16 +32,12 @@
     const buttonGroup = document.querySelector('.button-group');
     const navbar = document.querySelector('.navbar_component');
 
-    if (!bgWrapper || !bgImage || !overlay || !navbar) {
-      console.warn("⚠️ No se encontraron los elementos del header.");
-      return;
-    }
-
-    // Reset de estilos
+    // Reset de transformaciones para evitar conflictos
     gsap.set([bgImage, overlay, heading, subheading, buttonGroup, navbar], {
       clearProps: "transform"
     });
 
+    // Timeline de entrada
     const introTl = gsap.timeline({
       defaults: { ease: "power3.out", duration: 1.4 }
     });
@@ -43,6 +61,7 @@
         duration: 1
       });
 
+    // Scroll-trigger para paralaje
     gsap.to(bgImage, {
       y: 40,
       ease: "none",
@@ -55,13 +74,14 @@
     });
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", () => {
-      console.log("🚀 DOMContentLoaded disparado");
-      initHeroHeader();
-    });
-  } else {
-    console.log("⚡️ DOM ya listo");
-    initHeroHeader();
-  }
+  // 🚀 Ejecutar cuando todos los elementos estén listos
+  waitForElements([
+    '.header-v7_background-image-wrapper',
+    '.header-v7_background-image',
+    '.image-overlay-layer',
+    '.home-hero-heading',
+    '.home-hero-subheading',
+    '.button-group',
+    '.navbar_component'
+  ], initHeroHeader);
 })();
