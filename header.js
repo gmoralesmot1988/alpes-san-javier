@@ -1,28 +1,26 @@
 (function () {
-  // 🔁 Esperar a que todos los elementos estén disponibles en el DOM
-  function waitForElements(selectors, callback, timeout = 5000) {
-    const interval = 100;
-    const maxAttempts = timeout / interval;
-    let attempts = 0;
+  function waitForElements(selectors, callback, interval = 100, timeout = 5000) {
+    const start = Date.now();
 
     const check = () => {
-      const elements = selectors.map(selector => document.querySelector(selector));
-      if (elements.every(el => el)) {
-        console.log("✅ Todos los elementos del header están disponibles.");
+      const elements = selectors.map(sel => document.querySelector(sel));
+      const allExist = elements.every(el => el);
+
+      if (allExist) {
+        console.log("✅ Elementos encontrados, iniciando animación.");
         callback();
-      } else if (attempts++ < maxAttempts) {
+      } else if (Date.now() - start < timeout) {
         setTimeout(check, interval);
       } else {
-        console.warn("⚠️ No se encontraron todos los elementos para la animación del header.");
+        console.warn("❌ Timeout esperando elementos. No se encontró todo lo necesario.");
       }
     };
 
     check();
   }
 
-  // 🎬 Animación del Hero Header
   function initHeroHeader() {
-    console.log("🎬 Hero Header Animation INIT");
+    console.log("🚀 Hero Header INIT");
 
     const bgWrapper = document.querySelector('.header-v7_background-image-wrapper');
     const bgImage = document.querySelector('.header-v7_background-image');
@@ -32,12 +30,10 @@
     const buttonGroup = document.querySelector('.button-group');
     const navbar = document.querySelector('.navbar_component');
 
-    // Reset de transformaciones para evitar conflictos
     gsap.set([bgImage, overlay, heading, subheading, buttonGroup, navbar], {
       clearProps: "transform"
     });
 
-    // Timeline de entrada
     const introTl = gsap.timeline({
       defaults: { ease: "power3.out", duration: 1.4 }
     });
@@ -61,7 +57,6 @@
         duration: 1
       });
 
-    // Scroll-trigger para paralaje
     gsap.to(bgImage, {
       y: 40,
       ease: "none",
@@ -74,7 +69,7 @@
     });
   }
 
-  // 🚀 Ejecutar cuando todos los elementos estén listos
+  // Espera específica para DOM dinámico
   waitForElements([
     '.header-v7_background-image-wrapper',
     '.header-v7_background-image',
